@@ -1,1 +1,1 @@
-this short project is about loadView(), WKWebView, delegation, URL, URLRequest, UIToolbar, UIProgressView, KVO and more
+this is short project about loadView(), WKWebView, delegation, URL, URLRequest, UIToolbar, UIProgressView, KVO and more
