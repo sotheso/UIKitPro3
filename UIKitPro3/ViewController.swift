@@ -11,24 +11,35 @@ import WebKit
 class ViewController: UIViewController, WKNavigationDelegate {
     
     var webView: WKWebView!
+    // دکمه پیشرقت لود شدن صفحه
+    var progressView: UIProgressView!
     
     override func loadView() {
         webView = WKWebView()
         webView.navigationDelegate = self
         view = webView
-        
-        NSLayoutConstraint.activate([
-                webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-                webView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-            ])
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(openToped))
+        
+        // دکمه ریفرش پایین صفحه
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
+        
+        // دکمه پیشرقت لود شدن صفحه
+        progressView = UIProgressView(progressViewStyle: .default)
+        progressView.sizeToFit()
+        let progressButton = UIBarButtonItem(customView: progressView)
+        
+        // پوزیشن قرار گیری دکمه‌های پایین صحفه
+        toolbarItems = [progressButton ,spacer ,refresh]
+        navigationController?.isToolbarHidden = false
+        
+        // اضافه کردن نقطه ناظر
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress) ,options: .new, context: nil)
         
         let url = URL(string: "https://www.hackingwithswift.com")!
         webView.load(URLRequest(url: url))
@@ -56,7 +67,13 @@ class ViewController: UIViewController, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         title = webView.title
     }
-                    
+    
+    // تابع پیشرفت ناظر
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "estimatedProgress" {
+            progressView.progress = Float(webView.estimatedProgress)
+        }
+    }
 
 }
 
